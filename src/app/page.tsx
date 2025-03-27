@@ -1,38 +1,31 @@
-'use client';
+'use client'
 
-import axios from 'axios';
-import { useState } from 'react';
+import axios from "axios";
+import { useState } from "react";
 
-export default function CreatePostForm() {
-  const [title, setTitle] = useState('');
+export default function CreatePost() {
+  const [title, setTitle] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePost = async () => {
     try {
-      // IMPORTANT: Correct API route path
-      const response = await axios.post('/api', { 
-        title 
-      });
-      console.log(response.data);
+      const response = await axios.post("/api/post", { title });
+      console.log("Post Created:", response.data);
+      alert("Post added!");
     } catch (error) {
-      // Detailed error logging
-      if (axios.isAxiosError(error)) {
-        console.error('Error details:', error.response?.data);
-        console.error('Status:', error.response?.status);
-      }
-      console.error('Full error:', error);
+      console.error("Error:", error);
+      alert("Failed to add post");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <input
         type="text"
+        placeholder="Enter title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Post Title"
       />
-      <button type="submit">Create Post</button>
-    </form>
+      <button onClick={handlePost}>Create Post</button>
+    </div>
   );
 }

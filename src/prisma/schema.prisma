@@ -13,8 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id    String @id @default(cuid())
-  title String
-  createdAt DateTime @default(now())
+
+model Food {
+  id              String    @id @default(uuid())
+  food_name       String    
+  food_description String   
+  price           Int       // Changed from String to Int
+  food_image      String    
+  categoryId      String?   // Foreign key to categories
+  category        Category? @relation(fields: [categoryId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime? @updatedAt
 }
+
+model Category {
+  id    String  @id @default(uuid())
+  title String  
+  foods Food[]
+}
+

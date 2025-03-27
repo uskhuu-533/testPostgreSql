@@ -1,21 +1,38 @@
-'use client'
+"use client";
 
+
+import { Category } from "@prisma/client";
 import axios from "axios";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<Category[]>([]);
 
-  const handlePost = async () => {
+  const getCategory = async () => {
     try {
-      const response = await axios.post("/api/post", { title });
+      const response = await axios.get("/api/category");  // This should be a GET request
       console.log("Post Created:", response.data);
-      alert("Post added!");
+      setCategory(response.data);
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to add post");
+      console.log("Error:", error);
     }
   };
+  useEffect(() => {
+    getCategory();
+  }, []);
+  const addCategory = async () => {
+    try {
+      const res = await axios.post('api/category', {title:title})
+      console.log(res);
+      getCategory()
+      setTitle('')
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
 
   return (
     <div>
@@ -25,7 +42,10 @@ export default function CreatePost() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <button onClick={handlePost}>Create Post</button>
+      <button onClick={addCategory}>add category</button>
+      {category.map((category, index)=>(
+        <div key={index}>{category.title}</div>
+      ))}
     </div>
   );
 }

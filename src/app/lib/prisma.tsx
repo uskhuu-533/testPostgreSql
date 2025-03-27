@@ -1,12 +1,36 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
+// Create a function to initialize Prisma with error handling
+const createPrismaClient = () => {
+  try {
+    const client = new PrismaClient({
+      log: ['error', 'warn'],
+    })
+    
+    // Test connection
+    client.$connect()
+      .then(() => console.log('✅ Prisma connected successfully'))
+      .catch((err) => {
+        console.error('❌ Prisma connection error:', err);
+        throw err;
+      });
+    
+    return client;
+  } catch (error) {
+    console.error('Failed to create Prisma client:', error);
+    throw error;
+  }
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    // Optional: add logging or other configuration
-    // log: ['query'], // Uncomment to log queries
-  })
+// Singleton pattern with explicit error handling
+const globalForPrisma = globalThis as unknown as { 
+  prisma: PrismaClient | undefined 
+}
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma = 
+  globalForPrisma.prisma || 
+  createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+}
